@@ -1,28 +1,21 @@
 language: python
 
 python:
-  - "2.6"
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "pypy"
+  - 2.6
+  - 2.7
+  - 3.2
+  - 3.3
+  - 3.4
+  - 3.5
+  - 3.5-dev
+  - nightly
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq autoconf libcurl4-openssl-dev automake libtool lcov
-  - 
-  - pip install coveralls
+  - sudo apt-get install -qq autoconf libcurl4-openssl-dev automake libtool
 
 install:
-  - git clone git://github.com/vstakhov/libucl
-  - cd libucl && ./autogen.sh && ./configure --enable-urls && make all install DESTDIR=..
-  - python setup.py clean --all
-  - python setup.py install
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
+  - ./.travis.libucl.sh
 
 script:
-  - python -W always setup.py test
-
-after_success:
-  - coveralls
+  - python setup.py test

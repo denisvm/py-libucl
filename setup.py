@@ -2,8 +2,11 @@
 # import distutils.sysconfig
 # from distutils.core import setup, Extension
 import os
+import sys
 from setuptools import setup, Extension
 
+# if sys.version < '2.7': 
+#       tests_require.append('unittest2') 
 
 # compiler  = distutils.ccompiler.new_compiler()
 # search_paths=[os.path.expanduser('~/%s'), '/opt/local/%s', '/usr/local/%s', '/usr/%s']

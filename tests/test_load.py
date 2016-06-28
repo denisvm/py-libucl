@@ -1,12 +1,14 @@
-import unittest
+from .compat import unittest
 import ucl
 
-class TestUclLoad(unittest.TestCase):
+class LoadTest(unittest.TestCase):
     def test_no_args(self):
-        self.assertRaises(TypeError, lambda: ucl.load())
+        with self.assertRaises(TypeError):
+            ucl.load()
 
     def test_multi_args(self):
-        self.assertRaises(TypeError, lambda: ucl.load(0,0))
+        with self.assertRaises(TypeError):
+            ucl.load(0,0)
 
     def test_none(self):
         r = ucl.load(None)
@@ -50,13 +52,14 @@ class TestUclLoad(unittest.TestCase):
         self.assertEqual(ucl.load("["), [])
 
     def test_invalid_ucl(self):
-        self.assertRaisesRegex(ValueError, "unfinished key$", lambda: ucl.load('{ "var"'))
+        with self.assertRaisesRegex(ValueError, "unfinished key$"):
+            ucl.load('{ "var"')
 
     def test_comment_ignored(self):
         self.assertEqual(ucl.load("{/*1*/}"), {})
 
     def test_1_in(self):
-        with open("../tests/basic/1.in", "r") as in1:
+        with open("vendor/libucl/tests/basic/1.in", "r") as in1:
             self.assertEqual(ucl.load(in1.read()), {'key1': 'value'})
 
     def test_every_type(self):

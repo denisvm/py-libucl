@@ -1,12 +1,15 @@
-import unittest
+from .compat import unittest
 import ucl
+import sys
 
-class TestUclDump(unittest.TestCase):
+class DumpTest(unittest.TestCase):
     def test_no_args(self):
-        self.assertRaises(TypeError, lambda: ucl.dump())
+        with self.assertRaises(TypeError):
+            ucl.dump()
 
     def test_multi_args(self):
-        self.assertRaises(TypeError, lambda: ucl.dump(0, 0))
+        with self.assertRaises(TypeError):
+            ucl.dump(0, 0)
 
     def test_none(self):
         self.assertEqual(ucl.dump(None), None)
@@ -23,8 +26,9 @@ class TestUclDump(unittest.TestCase):
     def test_str(self):
         self.assertEqual(ucl.dump({"a" : "b"}), "a = \"b\";\n")
 
+    @unittest.skipIf(sys.version_info[0] > 2, "Py3k uses only unicode")
     def test_unicode(self):
-        self.assertEqual(ucl.dump({u"a" : u"b"}), u"a = \"b\";\n")
+        self.assertEqual(ucl.dump({unicode("a") : unicode("b")}), unicode("a = \"b\";\n"))
 
     def test_float(self):
         self.assertEqual(ucl.dump({"a" : 1.1}), "a = 1.100000;\n")
