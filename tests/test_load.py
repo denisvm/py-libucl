@@ -1,0 +1,91 @@
+import unittest
+import ucl
+
+class TestUclLoad(unittest.TestCase):
+    def test_no_args(self):
+        self.assertRaises(TypeError, lambda: ucl.load())
+
+    def test_multi_args(self):
+        self.assertRaises(TypeError, lambda: ucl.load(0,0))
+
+    def test_none(self):
+        r = ucl.load(None)
+        self.assertEqual(r, None)
+
+    def test_int(self):
+        r = ucl.load("a : 1")
+        self.assertEqual(ucl.load("a : 1"), { "a" : 1 } )
+
+    def test_braced_int(self):
+        self.assertEqual(ucl.load("{a : 1}"), { "a" : 1 } )
+
+    def test_nested_int(self):
+        self.assertEqual(ucl.load("a : { b : 1 }"), { "a" : { "b" : 1 } })
+
+    def test_str(self):
+        self.assertEqual(ucl.load("a : b"), {"a" : "b"})
+
+    def test_float(self):
+        self.assertEqual(ucl.load("a : 1.1"), {"a" : 1.1})
+
+    def test_boolean(self):
+        totest = (
+            "a : True;" \
+            "b : False"
+        )
+        correct = {"a" : True, "b" : False}
+        self.assertEqual(ucl.load(totest), correct)
+
+    def test_empty_ucl(self):
+        r = ucl.load("{}")
+        self.assertEqual(r, {})
+
+    def test_single_brace(self):
+        self.assertEqual(ucl.load("{"), {})
+
+    def test_single_back_brace(self):
+        ucl.load("}")
+
+    def test_single_square_forward(self):
+        self.assertEqual(ucl.load("["), [])
+
+    def test_invalid_ucl(self):
+        self.assertRaisesRegex(ValueError, "unfinished key$", lambda: ucl.load('{ "var"'))
+
+    def test_comment_ignored(self):
+        self.assertEqual(ucl.load("{/*1*/}"), {})
+
+    def test_1_in(self):
+        with open("../tests/basic/1.in", "r") as in1:
+            self.assertEqual(ucl.load(in1.read()), {'key1': 'value'})
+
+    def test_every_type(self):
+        totest="""{
+            "key1": value;
+            "key2": value2;
+            "key3": "value;"
+            "key4": 1.0,
+            "key5": -0xdeadbeef
+            "key6": 0xdeadbeef.1
+            "key7": 0xreadbeef
+            "key8": -1e-10,
+            "key9": 1
+            "key10": true
+            "key11": no
+            "key12": yes
+        }"""
+        correct = {
+                'key1': 'value',
+                'key2': 'value2',
+                'key3': 'value;',
+                'key4': 1.0,
+                'key5': -3735928559,
+                'key6': '0xdeadbeef.1',
+                'key7': '0xreadbeef',
+                'key8': -1e-10,
+                'key9': 1,
+                'key10': True,
+                'key11': False,
+                'key12': True,
+                }
+        self.assertEqual(ucl.load(totest), correct)

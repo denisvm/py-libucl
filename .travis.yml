@@ -1,0 +1,28 @@
+language: python
+
+python:
+  - "2.6"
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "pypy"
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq autoconf libcurl4-openssl-dev automake libtool lcov
+  - 
+  - pip install coveralls
+
+install:
+  - git clone git://github.com/vstakhov/libucl
+  - cd libucl && ./autogen.sh && ./configure --enable-urls && make all install DESTDIR=..
+  - python setup.py clean --all
+  - python setup.py install
+
+script:
+  - python -W always setup.py test
+
+after_success:
+  - coveralls
